@@ -63,3 +63,63 @@ Consider a "Library Management System."
 - Classes: `Book`, `Library`, `Member`
 - Relationships: `Book` is associated with `Library` and `Member`.
 
+
+
+
+
+Here is a Python program that implements the *Travelling Salesperson Problem (TSP)* using dynamic programming (Bellman-Held-Karp algorithm) based on the given adjacency matrix:
+
+python
+from itertools import combinations
+
+# Function to implement the Bellman-Held-Karp algorithm
+def tsp_dp(graph):
+    n = len(graph)
+    all_sets = []
+    g = {}
+
+    # Create a list of all possible subsets of the vertices excluding the starting point (A, which is index 0)
+    for x in range(1, n):
+        g[(x, ())] = graph[x][0]  # Base case: distance from x to A
+
+    # Iterate through subsets of increasing length
+    for subset_size in range(1, n - 1):
+        for subset in combinations(range(1, n), subset_size):
+            for j in range(1, n):
+                if j not in subset:
+                    # Find the minimum cost to reach vertex j from any subset that doesn't include j
+                    g[(j, subset)] = min(
+                        graph[j][k] + g[(k, tuple(x for x in subset if x != k))]
+                        for k in subset
+                    )
+
+    # Consider the final subset, which includes all vertices except the start
+    subset = tuple(range(1, n))
+    min_cost = min(
+        graph[0][k] + g[(k, tuple(x for x in subset if x != k))] for k in range(1, n)
+    )
+
+    return min_cost
+
+# Adjacency matrix from the problem
+graph = [
+    [0, 3, 5, 4],  # A
+    [4, 0, 7, 5],  # B
+    [6, 8, 0, 9],  # C
+    [5, 4, 8, 0]   # D
+]
+
+# Call the tsp_dp function
+min_cost = tsp_dp(graph)
+print(f"The minimum cost of the tour is: {min_cost}")
+
+
+### How the Program Works:
+- *Graph Representation:* The adjacency matrix is represented as a 2D list graph.
+- **Dynamic Programming Table (g):** This stores the minimum cost to reach each vertex from subsets of other vertices.
+- *Combinations:* We generate all possible subsets of vertices (excluding the starting vertex A) and calculate the minimum tour cost using the formula given.
+
+### Expected Output:
+When you run this code with the given adjacency matrix, it will compute the minimum cost of the shortest tour that starts at vertex A, visits all vertices (B, C, D) exactly once, and returns to A.
+
+This approach ensures the shortest path using dynamic programming to minimize computation time compared to a brute-force solution.
